@@ -28,7 +28,7 @@ class TfIdfIntentProcessor:
         self.ignore_pos = ['DET']
 
     def train(self):
-        pass
+        raise NotImplementedError
 
     def load(self):
         with open('data/training.json') as training_file:
@@ -57,12 +57,45 @@ class TfIdfIntentProcessor:
         output = {result[0]: result[1] for result in results}
         return output
 
+class MitIntentProcessor:
+    """
+    """
+    def __init__(self):
+        self.categorizer = None
+        self.ignore_pos = ['DET']
+
+    def train(self):
+        with open('data/training.json') as training_file:
+            training = json.load(training_file)
+            trainer = mitie.text_categorizer_trainer("models/total_word_feature_extractor.dat")
+            for sample in training['samples']:
+                sample_doc = spacy_nlp(sample['text'])
+                tokens = [token.text.lower() for token in sample_doc]
+                for entity in sample['entities']:
+                    tokens[entity['start']:entity['stop']] = ['#%s#' % (entity['type'])]
+                for i, _ in enumerate(tokens):
+                    if sample_doc[i].pos_ in self.ignore_pos: del tokens[i]
+                trainer.add_labeled_text(tokens, sample['intent'])
+            trainer.num_threads = 2
+            self.categorizer = trainer.train()
+            self.categorizer.save_to_disk("models/vince_categorizer_model.dat")
+
+    def load(self):
+        self.categorizer = mitie.text_categorizer("models/vince_categorizer_model.dat")
+
+    def classify(self, text):
+        tokens = [token.text.lower() for token in spacy_nlp(text) if token.pos_ not in self.ignore_pos]
+        tokens = util.preserve_entity_annotations(tokens)
+        result = self.categorizer(tokens)
+        output = {result[0]: result[1]}
+        return output
+
 class IntentProcessor:
     """
     """
 
     def __init__(self):
-        self.processor = TfIdfIntentProcessor()
+        self.processor = MitIntentProcessor()
 
     def train(self):
         self.processor.train()
@@ -210,7 +243,9 @@ class NLU:
 
         try: self.entity_processor.load()
         except: self.entity_processor.train()
-        self.intent_processor.load()
+        
+        try: self.intent_processor.load()
+        except: self.intent_processor.train()
 
     def pipe(self, f_list, data):
         output = data
