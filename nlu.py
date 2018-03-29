@@ -71,7 +71,8 @@ class MitIntentProcessor:
     def train(self):
         with open('data/training.json') as training_file:
             training = json.load(training_file)
-            trainer = mitie.text_categorizer_trainer("models/total_word_feature_extractor.dat")
+            try: trainer = mitie.text_categorizer_trainer("models/total_word_feature_extractor.dat")
+            except: trainer = mitie.text_categorizer_trainer("botkit/models/total_word_feature_extractor.dat")
             for sample in training['samples']:
                 sample_doc = spacy_nlp(sample['text'])
                 tokens = [token.text.lower() for token in sample_doc]
@@ -124,7 +125,8 @@ class MitEntityProcessor:
             examples.append(mitie.ner_training_instance([token.text for token in spacy_nlp(sample['text'])]))
             for entity in sample['entities']:
                 examples[-1].add_entity(range(entity['start'], entity['stop']), entity['type'])
-        trainer = mitie.ner_trainer("models/total_word_feature_extractor.dat")
+        try: trainer = mitie.ner_trainer("models/total_word_feature_extractor.dat")
+        except: trainer = mitie.ner_trainer("botkit/models/total_word_feature_extractor.dat")
         trainer.num_threads = 2
         for example in examples:
             trainer.add(example)
