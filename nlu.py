@@ -83,10 +83,10 @@ class MitIntentProcessor:
                 trainer.add_labeled_text(tokens, sample['intent'])
             trainer.num_threads = 2
             self.categorizer = trainer.train()
-            self.categorizer.save_to_disk("models/vince_categorizer_model.dat")
+            self.categorizer.save_to_disk("models/categorizer_model.dat")
 
     def load(self):
-        self.categorizer = mitie.text_categorizer("models/vince_categorizer_model.dat")
+        self.categorizer = mitie.text_categorizer("models/categorizer_model.dat")
 
     def classify(self, text):
         tokens = [token.text.lower() for token in spacy_nlp(text) if token.pos_ not in self.ignore_pos]
@@ -131,10 +131,10 @@ class MitEntityProcessor:
         for example in examples:
             trainer.add(example)
         self.ner = trainer.train()
-        self.ner.save_to_disk("models/vince_ner_model.dat")
+        self.ner.save_to_disk("models/ner_model.dat")
 
     def load(self):
-        self.ner = mitie.named_entity_extractor('models/vince_ner_model.dat')
+        self.ner = mitie.named_entity_extractor('models/ner_model.dat')
 
     def recognize(self, text):
         output = list()
