@@ -10,11 +10,15 @@ import operator
 import mitie
 import spacy
 import textblob
-import external.python_tf_idf.tfidf as tfidf
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-import util
+try:
+    import botkit.external.python_tf_idf.tfidf as tfidf
+    import botkit.util as util
+except:
+    import external.python_tf_idf.tfidf as tfidf
+    import util
 
 spacy_nlp = spacy.load('en')
 
