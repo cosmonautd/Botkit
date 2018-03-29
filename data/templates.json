@@ -1,0 +1,10 @@
+{
+    "greetings": [
+        "Hi, <NAME> :)",
+        "Hello, <NAME> :)"
+    ],
+
+    "who": [
+        "A person, of course!"
+    ]
+}

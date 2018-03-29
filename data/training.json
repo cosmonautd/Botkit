@@ -1,0 +1,24 @@
+{
+    "samples": [
+        {
+            "cluster": "base",
+            "intent": "greetings",
+            "text": "Hi",
+            "entities": []
+        },
+        {
+            "cluster": "base",
+            "intent": "greetings",
+            "text": "Hello",
+            "entities": []
+        },
+        {
+            "cluster": "base",
+            "intent": "who",
+            "text": "Who is Dave?",
+            "entities": [
+                {"type": "person", "start": 2, "stop": 3}
+            ]
+        }
+    ]
+}
