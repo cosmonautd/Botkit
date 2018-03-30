@@ -83,6 +83,7 @@ class MitIntentProcessor:
                 trainer.add_labeled_text(tokens, sample['intent'])
             trainer.num_threads = 2
             self.categorizer = trainer.train()
+            if not os.path.exists('models'): os.mkdir('models')
             self.categorizer.save_to_disk("models/categorizer_model.dat")
 
     def load(self):
@@ -131,6 +132,7 @@ class MitEntityProcessor:
         for example in examples:
             trainer.add(example)
         self.ner = trainer.train()
+        if not os.path.exists('models'): os.mkdir('models')
         self.ner.save_to_disk("models/ner_model.dat")
 
     def load(self):
