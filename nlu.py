@@ -241,17 +241,20 @@ class Context:
 class NLU:
     """ Natural Language Understanding class
     """
-    def __init__(self):
+    def __init__(self, disable=list()):
         """
         """
-        self.entity_processor = EntityProcessor()
-        self.intent_processor = IntentProcessor()
+        self.disable = disable
 
-        try: self.entity_processor.load()
-        except: self.entity_processor.train()
+        if 'intents' not in disable:
+            self.intent_processor = IntentProcessor()
+            try: self.intent_processor.load()
+            except: self.intent_processor.train()
         
-        try: self.intent_processor.load()
-        except: self.intent_processor.train()
+        if 'entities' not in disable:
+            self.entity_processor = EntityProcessor()
+            try: self.entity_processor.load()
+            except: self.entity_processor.train()
 
     def pipe(self, f_list, data):
         output = data
@@ -297,27 +300,34 @@ class NLU:
 
     def intents(self, data):
         output = data
-        output['intents'] = self.intent_processor.classify(data['text_en_tagged'])
+        if 'text_en_tagged' in data: output['intents'] = self.intent_processor.classify(data['text_en_tagged'])
+        elif 'text_en' in data: output['intents'] = self.intent_processor.classify(data['text_en'])
+        else: output['intents'] = self.intent_processor.classify(data['text'])
         output['intent'] = max(output['intents'], key=output['intents'].get)
         return output
 
     def postprocess(self, data):
         output = data
-        del output['tokens_tagged']
+        try:
+            del output['tokens_tagged']
+        except:
+            pass
         return output
 
     def compute(self, text):
         """
         """
         data = {'text': text}
-        return self.pipe([
-            self.preprocess,
-            self.language,
-            self.sentiments,
-            self.entities,
-            self.intents,
-            self.postprocess
-        ], data)
+
+        pipeline = list()
+        pipeline.append(self.preprocess)
+        if 'language' not in self.disable: pipeline.append(self.language)
+        if 'sentiments' not in self.disable: pipeline.append(self.sentiments)
+        if 'entities' not in self.disable: pipeline.append(self.entities)
+        if 'intents'  not in self.disable: pipeline.append(self.intents)
+        pipeline.append(self.postprocess)
+
+        return self.pipe(pipeline, data)
 
 if __name__ == '__main__':
 
