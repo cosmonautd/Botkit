@@ -101,7 +101,7 @@ class IntentProcessor:
     """
 
     def __init__(self):
-        self.processor = MitIntentProcessor()
+        self.processor = TfIdfIntentProcessor()
 
     def train(self):
         self.processor.train()
@@ -252,7 +252,7 @@ class NLU:
             self.intent_processor = IntentProcessor()
             try: self.intent_processor.load()
             except: self.intent_processor.train()
-        
+
         if 'entities' not in disable:
             self.entity_processor = EntityProcessor()
             try: self.entity_processor.load()
