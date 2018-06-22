@@ -274,15 +274,14 @@ class NLU:
         output = data
         blob = textblob.TextBlob(data['text'] + "   ")
         output['language'] = blob.detect_language()
-        try: output['text_en'] = str(blob.translate(to='en')).strip()
-        except: output['text_en'] = data['text']
+        # output['text_en'] = str(blob.translate(to='en')).strip()
         return output
 
     def sentiments(self, data):
         """
         """
         output = data
-        scores = SentimentIntensityAnalyzer().polarity_scores(data['text_en'])
+        scores = SentimentIntensityAnalyzer().polarity_scores(data['text'])
         output['sentiments'] = {
             "compound" : scores['compound'],
             "positive" : scores['pos'],
@@ -293,17 +292,16 @@ class NLU:
 
     def entities(self, data):
         output = data
-        output['entities'] = self.entity_processor.recognize(data['text_en'])
-        output['tokens_tagged'] = [token.text for token in spacy_nlp(data['text_en'])]
+        output['entities'] = self.entity_processor.recognize(data['text'])
+        output['tokens_tagged'] = [token.text for token in spacy_nlp(data['text'])]
         for entity in output['entities']:
             output['tokens_tagged'][entity['start']:entity['stop']] = ['#%s#' % entity['type']]
-        output['text_en_tagged'] = util.untokenize(output['tokens_tagged'])
+        output['text_tagged'] = util.untokenize(output['tokens_tagged'])
         return output
 
     def intents(self, data):
         output = data
-        if 'text_en_tagged' in data: output['intents'] = self.intent_processor.classify(data['text_en_tagged'])
-        elif 'text_en' in data: output['intents'] = self.intent_processor.classify(data['text_en'])
+        if 'text_tagged' in data: output['intents'] = self.intent_processor.classify(data['text_tagged'])
         else: output['intents'] = self.intent_processor.classify(data['text'])
         output['intent'] = max(output['intents'], key=output['intents'].get)
         return output
