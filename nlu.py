@@ -282,7 +282,10 @@ class NLU:
         """
         """
         output = data
-        scores = SentimentIntensityAnalyzer().polarity_scores(data['text'])
+        if 'text_en' in data:
+            scores = SentimentIntensityAnalyzer().polarity_scores(data['text_en'])
+        else:
+            scores = SentimentIntensityAnalyzer().polarity_scores(data['text'])
         output['sentiments'] = {
             "compound" : scores['compound'],
             "positive" : scores['pos'],
@@ -293,8 +296,12 @@ class NLU:
 
     def entities(self, data):
         output = data
-        output['entities'] = self.entity_processor.recognize(data['text'])
-        output['tokens_tagged'] = [token.text for token in spacy_nlp(data['text'])]
+        if 'text_en' in data:
+            output['entities'] = self.entity_processor.recognize(data['text_en'])
+            output['tokens_tagged'] = [token.text for token in spacy_nlp(data['text_en'])]
+        else:
+            output['entities'] = self.entity_processor.recognize(data['text'])
+            output['tokens_tagged'] = [token.text for token in spacy_nlp(data['text'])]
         for entity in output['entities']:
             output['tokens_tagged'][entity['start']:entity['stop']] = ['#%s#' % entity['type']]
         output['text_tagged'] = util.untokenize(output['tokens_tagged'])
