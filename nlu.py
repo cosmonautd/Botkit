@@ -274,8 +274,8 @@ class NLU:
         output = data
         blob = textblob.TextBlob(data['text'] + "   ")
         output['language'] = blob.detect_language()
-        if output['language'] != 'en':
-            output['text_en'] = str(blob.translate(to='en')).strip()
+        try: output['text_en'] = str(blob.translate(to='en')).strip()
+        except: pass
         return output
 
     def sentiments(self, data):
@@ -312,7 +312,9 @@ class NLU:
         if 'text_tagged' in data: output['intents'] = self.intent_processor.classify(data['text_tagged'])
         elif 'text_en' in data: output['intents'] = self.intent_processor.classify(data['text_en'])
         else: output['intents'] = self.intent_processor.classify(data['text'])
-        output['intent'] = max(output['intents'], key=output['intents'].get)
+        maxintent = max(output['intents'], key=output['intents'].get)
+        if output['intents'][maxintent] > 0.1: output['intent'] = maxintent
+        else: output['intent'] = 'none'
         return output
 
     def postprocess(self, data):
