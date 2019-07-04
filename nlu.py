@@ -274,7 +274,8 @@ class NLU:
         output = data
         blob = textblob.TextBlob(data['text'] + "   ")
         output['language'] = blob.detect_language()
-        # output['text_en'] = str(blob.translate(to='en')).strip()
+        if output['language'] != 'en':
+            output['text_en'] = str(blob.translate(to='en')).strip()
         return output
 
     def sentiments(self, data):
@@ -302,6 +303,7 @@ class NLU:
     def intents(self, data):
         output = data
         if 'text_tagged' in data: output['intents'] = self.intent_processor.classify(data['text_tagged'])
+        elif 'text_en' in data: output['intents'] = self.intent_processor.classify(data['text_en'])
         else: output['intents'] = self.intent_processor.classify(data['text'])
         output['intent'] = max(output['intents'], key=output['intents'].get)
         return output
