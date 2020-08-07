@@ -1,5 +1,5 @@
-# botkit
-### Natural language understanding to build chatbots
+# Botkit
+### Simple natural language understanding to build chatbots
 
 This project emerged from the need of extracting information from written messages and improve intent recognition of a chatbot's client. Botkit's NLU module brings together functionality from a couple of free software packages into a compact framework that can be trained to process text inputs and recognize language, sentiments, entities and intentions. Botkit is used by [Turret](https://github.com/cosmonautd/Turret) to provide support for its chatbot module.
 
@@ -64,3 +64,6 @@ This project emerged from the need of extracting information from written messag
   "text_tagged": "Hello, #person# :)"
 }
 ```
+
+⚠️ Warning: these are simple examples of the data returned by the NLU module. The quality of the outputs depends on the dataset used to train the model.
+Both outputs shown above are the result of a training set with only 3 samples! If the same model is used for more complex sentences, it will probably fail. For better results, you should provide an adequate training set.
